@@ -30,6 +30,7 @@ type RealtimePublisher = {
 };
 
 const ONE_DAY_MS = 24 * 60 * 60 * 1000;
+const PLATFORM_FEE_RATE = 0.12;
 
 function requirePositiveCents(amount: number, field: string): void {
   if (!Number.isInteger(amount) || amount <= 0) {
@@ -381,7 +382,7 @@ export class MarketplaceService {
         throw new Error("Winning escrow is not available for release");
       }
 
-      const platformFee = Math.floor(record.clearingPrice * 0.1);
+      const platformFee = Math.floor(record.clearingPrice * PLATFORM_FEE_RATE);
       const netAmount = record.clearingPrice - platformFee;
 
       await this.pixEscrowGateway.releaseToExecutive({

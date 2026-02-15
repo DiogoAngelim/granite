@@ -1,6 +1,6 @@
 # Granite Marketplace API
 
-A marketplace backend where executives offer one timed slot, and owners place escrow-backed sealed bids, and the app auto-resolves contracts using 24h auction rules.
+A marketplace backend where executives offer their portfolio through one time-availability slot, owners place escrow-backed sealed bids, and the app auto-resolves contracts using 24h auction rules.
 
 ## Stack
 
@@ -9,6 +9,79 @@ A marketplace backend where executives offer one timed slot, and owners place es
 - Drizzle ORM
 - REST API
 - Simulated PIX escrow gateway
+
+## Architecture
+
+![Granite architecture](./architecture.png)
+
+## Platform philosophy
+
+### 1️⃣ Deterministic Portfolio Access
+
+The module enforces automatic, portfolio-first, rule-driven behavior:
+
+- Executives expose portfolio access through one availability slot at a time.
+- Owners bid for that access, but the engine decides the outcome.
+- No negotiation, no arbitration, no subjective interference.
+
+Philosophical implication:
+Value, Fairness, and trust emerge from the system structure, not human judgment.
+
+### 2️⃣ Scarcity as Value Signal
+
+- Only one slot per executive.
+- Invite-only executives.
+- Tight category clusters.
+
+Module enforcement: `POST /executive/slot` + one-slot check.
+
+Implication:
+Every availability slot tied to an executive portfolio is a premium, rare opportunity. Scarcity drives perceived value and naturally enforces price appreciation.
+
+### 3️⃣ Market-Determined Pricing
+
+- Executives set private reserves.
+- Vickrey clearing sets final price.
+- Bids below reserve are ignored; highest valid bid wins at second-highest price.
+
+Module enforcement: `POST /auction/close/:slotId` + reserve and clearing logic.
+
+Implication:
+Price is not imposed; the system discovers it. Executives protect time value, owners pay market-clearing value. Neutral, fair, market-driven.
+
+### 4️⃣ Binary Enforcement & Risk Containment
+
+- Completion outcomes are binary: `COMPLETED` or `BREACH`.
+- Automatic contract lifecycle.
+- Escrow handles funds deterministically.
+- 12% platform fee is deducted only on successful completion.
+
+Module enforcement: `POST /contract/:id/complete` + CRON checks for deadlines.
+
+Implication:
+Subjective evaluation is removed, disputes are minimized, and risk assignment is explicit. Outcomes stay predictable for all parties.
+
+### 5️⃣ Transparency Through Structure, Not Price
+
+- Portfolio and profile metadata are visible.
+- Bid and price history are not publicly exposed.
+- Reserve price remains private.
+
+Module enforcement: API design hides sensitive fields and enforces immutable state transitions.
+
+Implication:
+Honest bidding is encouraged, reputation is protected, and premium perception is preserved. Behavioral friction replaces manual policing.
+
+### 6️⃣ Minimal Platform Intervention
+
+- Platform facilitates escrow and enforces rules.
+- Platform does not arbitrate, negotiate, or mediate.
+- Role-based access keeps separation of powers.
+
+Module enforcement: API enforces state changes and prevents manual overrides.
+
+Implication:
+Platform acts as trusted infrastructure, not a middleman deciding value or outcomes. Trust emerges from deterministic logic.
 
 ## First run
 

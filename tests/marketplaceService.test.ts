@@ -377,15 +377,15 @@ describe("MarketplaceService", () => {
     expect(gateway.releaseToExecutive).toHaveBeenCalledWith({
       referenceId: "b1",
       executiveId: "e1",
-      netAmount: 90000,
-      platformFee: 10000,
+      netAmount: 88000,
+      platformFee: 12000,
     });
     expect(result).toEqual({
       contractId: "c1",
       status: "COMPLETED",
       clearingPrice: 100000,
-      platformFee: 10000,
-      netAmount: 90000,
+      platformFee: 12000,
+      netAmount: 88000,
     });
   });
 
