@@ -96,6 +96,8 @@ Platform acts as trusted infrastructure, not a middleman deciding value or outco
    ```env
    DATABASE_URL=postgres://postgres:postgres@localhost:5432/granite
    PORT=3000
+   RATE_LIMIT_MAX_REQUESTS=120
+   RATE_LIMIT_WINDOW_MS=60000
    ```
 
 3. Ensure PostgreSQL database exists:
@@ -134,6 +136,8 @@ Platform acts as trusted infrastructure, not a middleman deciding value or outco
 - `POST /slot/:id/bid`
 - `POST /auction/close/:slotId`
 - `POST /contract/:id/complete`
+- `GET /health`
+- `GET /ready`
 
 ## Real-time updates (cobid-style)
 

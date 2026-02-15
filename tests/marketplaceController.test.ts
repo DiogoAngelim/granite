@@ -62,6 +62,32 @@ describe("MarketplaceController", () => {
     expect(res.status).toHaveBeenCalledWith(400);
   });
 
+  it("returns 400 when reservePrice is not positive integer", async () => {
+    const req = {
+      auth: { userId: "e1", role: "EXECUTIVE" },
+      body: { tier: "7_DAYS", category: "design", reservePrice: 0, categories: ["design"] },
+      params: {},
+    } as any;
+    const res = createRes();
+
+    await controller.createExecutiveSlot(req, res as any);
+
+    expect(res.status).toHaveBeenCalledWith(400);
+  });
+
+  it("returns 400 when categories contain empty strings", async () => {
+    const req = {
+      auth: { userId: "e1", role: "EXECUTIVE" },
+      body: { tier: "7_DAYS", category: "design", reservePrice: 1000, categories: ["design", ""] },
+      params: {},
+    } as any;
+    const res = createRes();
+
+    await controller.createExecutiveSlot(req, res as any);
+
+    expect(res.status).toHaveBeenCalledWith(400);
+  });
+
   it("returns 400 when create slot service throws", async () => {
     service.createExecutiveSlot.mockRejectedValueOnce(new Error("boom"));
     const req = {
@@ -97,6 +123,15 @@ describe("MarketplaceController", () => {
 
   it("returns 400 when bid slot param is missing", async () => {
     const req = { auth: { userId: "p1", role: "OWNER" }, body: { amount: 10 }, params: {} } as any;
+    const res = createRes();
+
+    await controller.createBid(req, res as any);
+
+    expect(res.status).toHaveBeenCalledWith(400);
+  });
+
+  it("returns 400 when bid amount is invalid", async () => {
+    const req = { auth: { userId: "p1", role: "OWNER" }, body: { amount: 0 }, params: { id: "s1" } } as any;
     const res = createRes();
 
     await controller.createBid(req, res as any);
