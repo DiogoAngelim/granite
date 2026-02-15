@@ -11,6 +11,24 @@ import {
 } from "../db/schema.js";
 import { PixEscrowGateway } from "./paymentGateway.js";
 
+type RealtimePublisher = {
+  broadcastBidCreated: (payload: {
+    id: string;
+    slotId: string;
+    ownerId: string;
+    amount: number;
+    escrowStatus: string;
+    createdAt: Date;
+  }) => void;
+  broadcastAuctionClosed: (payload: {
+    slotId: string;
+    status: "VOID" | "IN_PROGRESS";
+    contractId?: string;
+    winningBidId?: string;
+    clearingPrice?: number;
+  }) => void;
+};
+
 const ONE_DAY_MS = 24 * 60 * 60 * 1000;
 
 function requirePositiveCents(amount: number, field: string): void {
@@ -29,7 +47,10 @@ function deadlineFromTier(startedAt: Date, tier: SlotTier): Date {
 }
 
 export class MarketplaceService {
-  constructor(private readonly pixEscrowGateway: PixEscrowGateway) { }
+  constructor(
+    private readonly pixEscrowGateway: PixEscrowGateway,
+    private readonly realtimePublisher?: RealtimePublisher,
+  ) { }
 
   async createExecutiveSlot(input: {
     executiveUserId: string;
@@ -178,6 +199,8 @@ export class MarketplaceService {
           createdAt: bids.createdAt,
         });
 
+      this.realtimePublisher?.broadcastBidCreated(createdBid);
+
       return createdBid;
     });
   }
@@ -247,6 +270,11 @@ export class MarketplaceService {
           .set({ activeSlotId: null })
           .where(eq(executiveProfiles.userId, lockedSlot.executiveId));
 
+        this.realtimePublisher?.broadcastAuctionClosed({
+          slotId,
+          status: "VOID",
+        });
+
         return { slotId, status: "VOID" as const };
       }
 
@@ -303,6 +331,14 @@ export class MarketplaceService {
         });
 
       await tx.update(slots).set({ status: "IN_PROGRESS" }).where(eq(slots.id, slotId));
+
+      this.realtimePublisher?.broadcastAuctionClosed({
+        slotId,
+        status: "IN_PROGRESS",
+        contractId: createdContract.id,
+        winningBidId: createdContract.winningBidId,
+        clearingPrice: createdContract.clearingPrice,
+      });
 
       return createdContract;
     });

@@ -62,6 +62,66 @@ A marketplace backend where executives offer one timed slot, and owners place es
 - `POST /auction/close/:slotId`
 - `POST /contract/:id/complete`
 
+## Real-time updates (cobid-style)
+
+The API now exposes a WebSocket endpoint on the same host/port as HTTP.
+
+- URL: `ws://localhost:3000`
+
+On connect, server sends:
+
+```json
+{
+   "type": "snapshot",
+   "payload": {
+      "connectedAt": "2026-02-15T16:30:00.000Z"
+   }
+}
+```
+
+When a bid is created (`POST /slot/:id/bid`), server broadcasts:
+
+```json
+{
+   "type": "bidCreated",
+   "payload": {
+      "id": "BID_ID",
+      "slotId": "SLOT_ID",
+      "ownerId": "OWNER_ID",
+      "amount": 150000,
+      "escrowStatus": "LOCKED",
+      "createdAt": "2026-02-15T16:30:00.000Z"
+   }
+}
+```
+
+When auction closes (`POST /auction/close/:slotId` or cron), server broadcasts:
+
+```json
+{
+   "type": "auctionClosed",
+   "payload": {
+      "slotId": "SLOT_ID",
+      "status": "VOID"
+   }
+}
+```
+
+or
+
+```json
+{
+   "type": "auctionClosed",
+   "payload": {
+      "slotId": "SLOT_ID",
+      "status": "IN_PROGRESS",
+      "contractId": "CONTRACT_ID",
+      "winningBidId": "BID_ID",
+      "clearingPrice": 120000
+   }
+}
+```
+
 ## cURL examples
 
 Assuming API is running at `http://localhost:3000`.

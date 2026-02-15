@@ -1,8 +1,11 @@
 import express from "express";
+import http from "node:http";
+import { WebSocketServer } from "ws";
 import { startMarketplaceCronJobs } from "./cron/marketplaceCron.js";
 import { MarketplaceController } from "./controllers/marketplaceController.js";
 import { MarketplaceService } from "./services/marketplaceService.js";
 import { PixEscrowGatewaySim } from "./services/paymentGateway.js";
+import { RealtimeHub } from "./services/realtimeHub.js";
 import { createMarketplaceRoutes } from "./routes/marketplaceRoutes.js";
 import type { UserType } from "./db/schema.js";
 import { applyPendingMigrations } from "./db/migrationRunner.js";
@@ -29,7 +32,11 @@ async function bootstrap() {
   app.use(express.json());
   app.use(authStubMiddleware);
 
-  const marketplaceService = new MarketplaceService(new PixEscrowGatewaySim());
+  const server = http.createServer(app);
+  const wss = new WebSocketServer({ server });
+  const realtimeHub = new RealtimeHub(wss);
+
+  const marketplaceService = new MarketplaceService(new PixEscrowGatewaySim(), realtimeHub);
   const marketplaceController = new MarketplaceController(marketplaceService);
 
   app.use(createMarketplaceRoutes(marketplaceController));
@@ -37,7 +44,7 @@ async function bootstrap() {
   startMarketplaceCronJobs(marketplaceService);
 
   const port = Number(process.env.PORT ?? 3000);
-  app.listen(port, () => {
+  server.listen(port, () => {
     console.log(`granite marketplace api listening on ${port}`);
   });
 }

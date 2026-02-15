@@ -19,20 +19,22 @@
     "drizzle-orm": "^0.36.4",
     "express": "^4.21.2",
     "node-cron": "^3.0.3",
-    "pg": "^8.13.1"
+    "pg": "^8.13.1",
+    "ws": "^8.19.0"
   },
   "devDependencies": {
-    "@types/express": "^5.0.0",
-    "@types/node-cron": "^3.0.11",
-    "@types/node": "^22.10.1",
-    "@types/pg": "^8.11.10",
-    "@vitest/coverage-v8": "^2.1.8",
     "@eslint/js": "^9.21.0",
+    "@types/express": "^5.0.0",
+    "@types/node": "^22.10.1",
+    "@types/node-cron": "^3.0.11",
+    "@types/pg": "^8.11.10",
+    "@types/ws": "^8.18.1",
+    "@vitest/coverage-v8": "^2.1.8",
     "eslint": "^9.21.0",
     "globals": "^15.15.0",
+    "tsx": "^4.19.2",
     "typescript": "^5.7.2",
     "typescript-eslint": "^8.24.1",
-    "tsx": "^4.19.2",
     "vitest": "^2.1.8"
   }
 }
