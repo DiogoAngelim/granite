@@ -1,6 +1,6 @@
 # Granite Marketplace API
 
-Backend API module for a Brazil-only premium portfolio allocation marketplace.
+A marketplace backend where executives offer one timed slot, and owners place escrow-backed sealed bids, and the app auto-resolves contracts using 24h auction rules.
 
 ## Stack
 
