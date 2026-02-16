@@ -5,7 +5,7 @@ import { pool } from "./db/client.js";
 import { startMarketplaceCronJobs } from "./cron/marketplaceCron.js";
 import { MarketplaceController } from "./controllers/marketplaceController.js";
 import { MarketplaceService } from "./services/marketplaceService.js";
-import { PixEscrowGatewaySim } from "./services/paymentGateway.js";
+import { createPixEscrowGatewayFromEnv } from "./services/paymentGateway.js";
 import { RealtimeHub } from "./services/realtimeHub.js";
 import { createMarketplaceRoutes } from "./routes/marketplaceRoutes.js";
 import type { UserType } from "./db/schema.js";
@@ -81,7 +81,8 @@ async function bootstrap() {
   const wss = new WebSocketServer({ server });
   const realtimeHub = new RealtimeHub(wss);
 
-  const marketplaceService = new MarketplaceService(new PixEscrowGatewaySim(), realtimeHub);
+  const pixEscrowGateway = createPixEscrowGatewayFromEnv();
+  const marketplaceService = new MarketplaceService(pixEscrowGateway, realtimeHub);
   const marketplaceController = new MarketplaceController(marketplaceService);
 
   app.get("/health", (_req, res) => {

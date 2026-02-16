@@ -10,6 +10,7 @@
     "start": "node dist/index.js",
     "db:migrate": "tsx src/db/migrate.ts",
     "db:rollback": "tsx src/db/rollback.ts",
+    "provider:dev": "tsx scripts/stripeProviderService.ts",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
     "test": "vitest run --coverage",
